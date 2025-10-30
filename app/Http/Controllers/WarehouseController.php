@@ -9,7 +9,8 @@ class WarehouseController extends Controller
 {
     public function index()
     {
-        $warehouses = Warehouse::with('currentLease')->get();
+        $warehouses = Warehouse::with('currentLease')->paginate(10);
+
         return view('warehouses.index', compact('warehouses'));
     }
 

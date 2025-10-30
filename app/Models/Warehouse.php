@@ -20,4 +20,9 @@ class Warehouse extends Model
         return $this->hasMany(Product::class);
     }
 
+      public function currentLease()
+    {
+        return $this->hasOne(Lease::class)->latestOfMany();
+        // latestOfMany() تجلب آخر عقد مرتبط بالمستودع
+    }
 }

@@ -9,12 +9,11 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
 
+use App\Http\Middleware\AdminMiddleware;
 // Dashboard Home
-Route::get('/', function () {
-    return view('dashboard');
-})->middleware('auth')->name('dashboard');
-
 // Warehouses
 Route::resource('warehouses', WarehouseController::class)->middleware('auth');
 
@@ -44,3 +43,11 @@ Route::get('/', function () {
 });
 
 Auth::routes();
+
+Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::resource('users', UserController::class);
+
+
+});
+
