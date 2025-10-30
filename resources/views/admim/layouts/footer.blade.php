@@ -1,14 +1,16 @@
-<!-- build:js assets/vendor/js/core.js -->
+<!-- Core JS -->
 <script src="{{ asset('admin/assets/vendor/libs/jquery/jquery.js') }}"></script>
 <script src="{{ asset('admin/assets/vendor/libs/popper/popper.js') }}"></script>
 <script src="{{ asset('admin/assets/vendor/js/bootstrap.js') }}"></script>
 <script src="{{ asset('admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
-
 <script src="{{ asset('admin/assets/vendor/js/menu.js') }}"></script>
-<!-- endbuild -->
+<script src="{{ asset('admin/assets/vendor/js/helpers.js') }}"></script>
+<script src="{{ asset('admin/assets/js/config.js') }}"></script>
 
 <!-- Vendors JS -->
 <script src="{{ asset('admin/assets/vendor/libs/apex-charts/apexcharts.js') }}"></script>
+<script src="https://unpkg.com/three@0.150.1/build/three.min.js"></script>
+<script src="https://unpkg.com/photo-sphere-viewer@4/dist/photo-sphere-viewer.js"></script>
 
 <!-- Main JS -->
 <script src="{{ asset('admin/assets/js/main.js') }}"></script>
@@ -16,14 +18,5 @@
 <!-- Page JS -->
 <script src="{{ asset('admin/assets/js/dashboards-analytics.js') }}"></script>
 
-<!-- Place this tag in your head or just before your close body tag. -->
+<!-- Optional: GitHub Buttons -->
 <script async defer src="https://buttons.github.io/buttons.js"></script>
-
-    <script src="{{ asset('admin/assets/vendor/libs/jquery/jquery.js') }}"></script>
-    <script src="{{ asset('admin/assets/vendor/js/bootstrap.js') }}"></script>
-<link rel="stylesheet" href="https://unpkg.com/photo-sphere-viewer@4/dist/photo-sphere-viewer.css">
-<script src="https://unpkg.com/three@0.150.1/build/three.min.js"></script>
-
-
-</body>
-</html>

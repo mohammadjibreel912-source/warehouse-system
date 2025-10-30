@@ -1,52 +1,75 @@
-<!DOCTYPE html>
-<html
-  lang="en"
-  class="light-style layout-menu-fixed"
-  dir="ltr"
-  data-theme="theme-default"
-  data-assets-path="{{ asset('admin/assets/') }}"
-  data-template="vertical-menu-template-free"
->
+<div class="layout-navbar shadow-sm bg-navbar-theme">
+  <nav class="navbar navbar-expand-xl align-items-center">
+    <div class="container-fluid">
 
-<head>
+      <!-- Sidebar toggle for mobile -->
+      <div class="layout-menu-toggle navbar-nav d-xl-none me-3">
+        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+          <i class="bx bx-menu bx-sm"></i>
+        </a>
+      </div>
 
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
-    />
+      <!-- Right side -->
+      <ul class="navbar-nav ms-auto align-items-center">
 
-    <title>Dashboard - Analytics |InventoryPro&deg; - Bootstrap 5 HTML Admin Template - Pro</title>
-    <meta name="description" content="" />
+        <!-- Notifications -->
+        <li class="nav-item dropdown me-3">
+          <a class="nav-link dropdown-toggle position-relative" href="#" id="notificationDropdown"
+             data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bx bx-bell bx-sm"></i>
+            @if(isset($unreadCount) && $unreadCount > 0)
+              <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">{{ $unreadCount }}</span>
+            @endif
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="notificationDropdown" style="width: 300px;">
+            @forelse($unreadNotifications ?? [] as $notification)
+              <li class="dropdown-item d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="fw-bold">{{ $notification->type }}</div>
+                  <small class="text-truncate d-block" style="max-width: 200px;">{{ $notification->message }}</small>
+                  <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+                </div>
+                <form action="{{ route('notifications.markAsRead', $notification->id) }}" method="POST">
+                  @csrf
+                  <button class="btn btn-sm btn-outline-success ms-2">✓</button>
+                </form>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+            @empty
+              <li class="dropdown-item text-center text-muted">No unread notifications</li>
+            @endforelse
+            <li class="text-center">
+              <a href="{{ route('notifications.index') }}" class="text-primary text-decoration-none">View All</a>
+            </li>
+          </ul>
+        </li>
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('admin/assets/img/favicon/favicon.ico') }}" />
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- Icons -->
-    <link rel="stylesheet" href="{{ asset('admin/assets/vendor/fonts/boxicons.css') }}" />
-
-    <!-- Core CSS -->
-    <link rel="stylesheet" href="{{ asset('admin/assets/vendor/css/core.css') }}" class="template-customizer-core-css" />
-    <link rel="stylesheet" href="{{ asset('admin/assets/vendor/css/theme-default.css') }}" class="template-customizer-theme-css" />
-    <link rel="stylesheet" href="{{ asset('admin/assets/css/demo.css') }}" />
-
-    <!-- Vendors CSS -->
-    <link rel="stylesheet" href="{{ asset('admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
-    <link rel="stylesheet" href="{{ asset('admin/assets/vendor/libs/apex-charts/apex-charts.css') }}" />
-
-    <!-- Helpers -->
-    <script src="{{ asset('admin/assets/vendor/js/helpers.js') }}"></script>
-
-    <!-- Template config -->
-    <script src="{{ asset('admin/assets/js/config.js') }}"></script>
-</head>
-
-<body>
+        <!-- User Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
+             data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="{{ auth()->user()->profile_image ?? asset('admin/assets/img/avatars/1.png') }}"
+                 alt="Avatar" class="rounded-circle me-2" width="32" height="32">
+            <span class="fw-medium">{{ auth()->user()->name ?? 'User' }}</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li>
+              <a class="dropdown-item" href="{{ route('users.edit', auth()->user()->id ?? 1) }}">
+                <i class="bx bx-user me-2"></i> Edit Profile
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="dropdown-item">
+                  <i class="bx bx-log-out me-2"></i> Logout
+                </button>
+              </form>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</div>

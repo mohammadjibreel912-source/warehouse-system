@@ -1,17 +1,57 @@
 @extends('admim.layouts.app')
+
 @section('content')
+<style>
+    /* لإعطاء مساحة كافية أسفل الهيدر */
+    .content-wrapper {
+        overflow-x: hidden;
+    }
 
-        @include('admim.layouts.sidebar')
+    /* تنسيق الكروت */
+    .card {
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: all 0.25s ease-in-out;
+        background: #fff;
+    }
 
-<div class="content-wrapper">
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-body i {
+        display: block;
+    }
+
+    /* تصحيح التباعد بين الصفوف */
+    .row {
+        margin-bottom: 1rem;
+    }
+
+    /* جعل التصميم متجاوب */
+    @media (max-width: 768px) {
+        .col-md-3 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .col-md-3 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+</style>
+
+<div class="">
     <div class="container-xxl flex-grow-1 container-p-y">
 
-        <!-- Dashboard Cards -->
-        <div class="row g-4 mb-4">
-
-            <!-- Total Warehouses -->
-            <div class="col-md-3">
-                <div class="card shadow-sm border-0 h-100 text-center hover-shadow">
+        <!-- Dashboard Cards Row 1 -->
+        <div class="row">
+            <div class="col-md-3 col-sm-6">
+                <div class="card text-center">
                     <div class="card-body">
                         <i class="bx bx-map fs-1 text-primary mb-2"></i>
                         <h6 class="text-muted mb-1">Total Warehouses</h6>
@@ -20,9 +60,8 @@
                 </div>
             </div>
 
-            <!-- Total Products -->
-            <div class="col-md-3">
-                <div class="card shadow-sm border-0 h-100 text-center hover-shadow">
+            <div class="col-md-3 col-sm-6">
+                <div class="card text-center h-100">
                     <div class="card-body">
                         <i class="bx bx-box fs-1 text-success mb-2"></i>
                         <h6 class="text-muted mb-1">Total Products</h6>
@@ -31,9 +70,8 @@
                 </div>
             </div>
 
-            <!-- Total Suppliers -->
-            <div class="col-md-3">
-                <div class="card shadow-sm border-0 h-100 text-center hover-shadow">
+            <div class="col-md-3 col-sm-6">
+                <div class="card text-center h-100">
                     <div class="card-body">
                         <i class="bx bx-car fs-1 text-info mb-2"></i>
                         <h6 class="text-muted mb-1">Total Suppliers</h6>
@@ -42,9 +80,8 @@
                 </div>
             </div>
 
-            <!-- Total Customers -->
-            <div class="col-md-3">
-                <div class="card shadow-sm border-0 h-100 text-center hover-shadow">
+            <div class="col-md-3 col-sm-6">
+                <div class="card text-center h-100">
                     <div class="card-body">
                         <i class="bx bx-user-circle fs-1 text-warning mb-2"></i>
                         <h6 class="text-muted mb-1">Total Customers</h6>
@@ -52,14 +89,12 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
+        <!-- Dashboard Cards Row 2 -->
         <div class="row g-4 mb-4">
-
-            <!-- Total Purchases -->
-            <div class="col-md-3">
-                <div class="card shadow-sm border-0 h-100 text-center hover-shadow">
+            <div class="col-md-3 col-sm-6">
+                <div class="card text-center h-100">
                     <div class="card-body">
                         <i class="bx bx-cart fs-1 text-danger mb-2"></i>
                         <h6 class="text-muted mb-1">Total Purchases</h6>
@@ -68,9 +103,8 @@
                 </div>
             </div>
 
-            <!-- Total Sales -->
-            <div class="col-md-3">
-                <div class="card shadow-sm border-0 h-100 text-center hover-shadow">
+            <div class="col-md-3 col-sm-6">
+                <div class="card text-center h-100">
                     <div class="card-body">
                         <i class="bx bx-money fs-1 text-danger mb-2"></i>
                         <h6 class="text-muted mb-1">Total Sales</h6>
@@ -79,9 +113,8 @@
                 </div>
             </div>
 
-            <!-- Total Leases -->
-            <div class="col-md-3">
-                <div class="card shadow-sm border-0 h-100 text-center hover-shadow">
+            <div class="col-md-3 col-sm-6">
+                <div class="card text-center h-100">
                     <div class="card-body">
                         <i class="bx bx-file fs-1 text-secondary mb-2"></i>
                         <h6 class="text-muted mb-1">Total Leases</h6>
@@ -90,9 +123,8 @@
                 </div>
             </div>
 
-            <!-- Revenue This Month -->
-            <div class="col-md-3">
-                <div class="card shadow-sm border-0 h-100 text-center hover-shadow">
+            <div class="col-md-3 col-sm-6">
+                <div class="card text-center h-100">
                     <div class="card-body">
                         <i class="bx bx-dollar fs-1 text-success mb-2"></i>
                         <h6 class="text-muted mb-1">Revenue (This Month)</h6>
@@ -100,37 +132,12 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
     </div>
 </div>
 
 
-
-                </div>
-
-                <!-- Footer -->
-                <footer class="content-footer footer bg-footer-theme mt-4">
-                    <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
-                        <div class="mb-2 mb-md-0">
-                            © {{ date('Y') }}, made with ❤️ by
-                            <a href="https://InventoryPro.com" target="_blank" class="footer-link fw-bolder">InventoryPro</a>
-                        </div>
-                        <div>
-
-
-                        </div>
-                    </div>
-                </footer>
-                <!-- /Footer -->
-
-            </div>
-
-<!-- Chart.js -->
-
-
-
-
+<!-- /Footer -->
 
 @endsection
