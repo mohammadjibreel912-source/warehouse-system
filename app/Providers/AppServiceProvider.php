@@ -12,6 +12,7 @@ use App\Models\Purchase;
 use App\Models\Sale;
 use App\Models\Lease;
 use App\Models\User;
+use App\Models\Notification;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,6 +40,9 @@ class AppServiceProvider extends ServiceProvider
             $totalPurchases   = Purchase::count();
             $totalSales       = Sale::count();
             $totalLeases      = Lease::count();
+                $unreadCount = Notification::whereNull('read_at')->count();
+    $unreadNotifications = Notification::whereNull('read_at')->latest()->take(5)->get();
+
 
             // الإيرادات لهذا الشهر (تأكد أن عمود المبلغ في جدول sales هو 'amount')
             $monthlyRevenue = Sale::whereMonth('created_at', now()->month)
@@ -53,6 +57,8 @@ class AppServiceProvider extends ServiceProvider
                 'totalSales'      => $totalSales,
                 'totalLeases'     => $totalLeases,
                 'monthlyRevenue'  => $monthlyRevenue,
+                'unreadCount' => $unreadCount,
+                'unreadNotifications' =>$unreadNotifications
             ]);
         });
     }

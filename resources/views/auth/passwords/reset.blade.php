@@ -13,7 +13,7 @@
               <span class="app-brand-logo demo">
                 <!-- يمكنك الاحتفاظ بشعارك SVG هنا -->
               </span>
-              <span class="app-brand-text demo text-body fw-bolder">Explore360&deg;</span>
+              <span class="app-brand-text demo text-body fw-bolder">InventoryPro&deg;</span>
             </a>
           </div>
           <!-- /Logo -->

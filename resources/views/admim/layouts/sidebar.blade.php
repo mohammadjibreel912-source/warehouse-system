@@ -4,7 +4,7 @@
       <span class="app-brand-logo demo me-2">
         <!-- SVG Logo هنا -->
       </span>
-      <span class="app-brand-text fw-bolder">Explore360&deg;</span>
+      <span class="app-brand-text fw-bolder">InventoryPro&deg;</span>
     </a>
 
     <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -15,6 +15,43 @@
   <div class="menu-inner-shadow"></div>
 
   <ul class="menu-inner py-1" style="border-left: none !important;">
+
+   <!-- Notifications -->
+<li class="menu-header small text-uppercase text-muted mt-3">
+    <i class="bx bx-bell me-1"></i>Notifications
+</li>
+<li class="menu-item dropdown">
+    <a href="#" class="menu-link d-flex align-items-center dropdown-toggle" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="menu-icon tf-icons bx bx-bell text-primary me-2"></i>
+        <div>Notifications
+            @if($unreadCount > 0)
+                <span class="badge bg-danger ms-1">{{ $unreadCount }}</span>
+            @endif
+        </div>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="notificationDropdown" style="width: 300px;">
+        @forelse($unreadNotifications as $notification)
+            <li class="dropdown-item d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="fw-bold">{{ $notification->type }}</div>
+                    <small class="text-truncate d-block" style="max-width: 200px;">{{ $notification->message }}</small>
+                    <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+                </div>
+                <form action="{{ route('notifications.markAsRead', $notification->id) }}" method="POST">
+                    @csrf
+                    <button class="btn btn-sm btn-success ms-2">✓</button>
+                </form>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+        @empty
+            <li class="dropdown-item text-center text-muted">No unread notifications</li>
+        @endforelse
+        <li class="text-center">
+            <a href="{{ route('notifications.index') }}" class="text-primary text-decoration-none">View All</a>
+        </li>
+    </ul>
+</li>
+
     <!-- Dashboard -->
     <li class="menu-item">
       <a href="{{ route('admin.dashboard') }}" class="menu-link d-flex align-items-center">

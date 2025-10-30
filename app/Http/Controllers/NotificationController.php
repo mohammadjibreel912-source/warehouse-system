@@ -15,7 +15,10 @@ class NotificationController extends Controller
 
     public function markAsRead(Notification $notification)
     {
-        $notification->update(['read_at' => now()]);
+        if (!$notification->read_at) {
+            $notification->update(['read_at' => now()]);
+        }
+
         return redirect()->back()->with('success', 'Notification marked as read.');
     }
 }

@@ -21,7 +21,7 @@
                                     <use fill="#696cff" xlink:href="#path-1"></use>
                                 </svg>
                             </span>
-                            <span class="app-brand-text demo text-body fw-bolder">Explore360&deg;</span>
+                            <span class="app-brand-text demo text-body fw-bolder">InventoryPro&deg;</span>
                         </a>
                     </div>
                     <!-- /Logo -->
