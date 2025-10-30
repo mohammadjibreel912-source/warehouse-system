@@ -2,22 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\WarehouseRepository;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 
 class WarehouseController extends Controller
 {
-    protected $warehouseRepo;
-
-    public function __construct(WarehouseRepository $warehouseRepo)
-    {
-        $this->middleware('auth');
-        $this->warehouseRepo = $warehouseRepo;
-    }
-
     public function index()
     {
-        $warehouses = $this->warehouseRepo->all();
+        $warehouses = Warehouse::with('currentLease')->get();
         return view('warehouses.index', compact('warehouses'));
     }
 
@@ -28,43 +20,39 @@ class WarehouseController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'lease_start_date' => 'nullable|date',
-            'lease_end_date' => 'nullable|date',
-            'rent_amount' => 'nullable|numeric',
+            'location' => 'required|string|max:255',
         ]);
 
-        $this->warehouseRepo->create($data);
-
-        return redirect()->route('warehouses.index')->with('success', 'Warehouse added successfully.');
+        Warehouse::create($request->all());
+        return redirect()->route('warehouses.index')->with('success', 'Warehouse created successfully.');
     }
 
-    public function edit($id)
+    public function show(Warehouse $warehouse)
     {
-        $warehouse = $this->warehouseRepo->find($id);
+        return view('warehouses.show', compact('warehouse'));
+    }
+
+    public function edit(Warehouse $warehouse)
+    {
         return view('warehouses.edit', compact('warehouse'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Warehouse $warehouse)
     {
-        $data = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'lease_start_date' => 'nullable|date',
-            'lease_end_date' => 'nullable|date',
-            'rent_amount' => 'nullable|numeric',
+            'location' => 'required|string|max:255',
         ]);
 
-        $this->warehouseRepo->update($id, $data);
-
+        $warehouse->update($request->all());
         return redirect()->route('warehouses.index')->with('success', 'Warehouse updated successfully.');
     }
 
-    public function destroy($id)
+    public function destroy(Warehouse $warehouse)
     {
-        $this->warehouseRepo->delete($id);
+        $warehouse->delete();
         return redirect()->route('warehouses.index')->with('success', 'Warehouse deleted successfully.');
     }
 }

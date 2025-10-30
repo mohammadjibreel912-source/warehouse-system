@@ -3,64 +3,63 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lease;
-use App\Http\Controllers\Controller;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 
 class LeaseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $leases = Lease::with('warehouse')->get();
+        return view('leases.index', compact('leases'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $warehouses = Warehouse::all();
+        return view('leases.create', compact('warehouses'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'warehouse_id' => 'required|exists:warehouses,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'rent_amount' => 'required|numeric|min:0',
+        ]);
+
+        Lease::create($request->all());
+        return redirect()->route('leases.index')->with('success', 'Lease created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Lease $lease)
     {
-        //
+        return view('leases.show', compact('lease'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Lease $lease)
     {
-        //
+        $warehouses = Warehouse::all();
+        return view('leases.edit', compact('lease', 'warehouses'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Lease $lease)
     {
-        //
+        $request->validate([
+            'warehouse_id' => 'required|exists:warehouses,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'rent_amount' => 'required|numeric|min:0',
+        ]);
+
+        $lease->update($request->all());
+        return redirect()->route('leases.index')->with('success', 'Lease updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Lease $lease)
     {
-        //
+        $lease->delete();
+        return redirect()->route('leases.index')->with('success', 'Lease deleted successfully.');
     }
 }
