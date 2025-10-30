@@ -39,3 +39,8 @@ Route::resource('sales', SaleController::class)->middleware('auth');
 // Notifications (عرض وقراءة فقط)
 Route::get('notifications', [NotificationController::class,'index'])->name('notifications.index')->middleware('auth');
 Route::post('notifications/{notification}/read', [NotificationController::class,'markAsRead'])->name('notifications.read')->middleware('auth');
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Auth::routes();
