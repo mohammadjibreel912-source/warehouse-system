@@ -53,6 +53,11 @@
                             </td>
                         </tr>
                         @endforeach
+                        @if($leases->isEmpty())
+                        <tr>
+                            <td colspan="6" class="text-center">No leases found.</td>
+                        </tr>
+                        @endif
                     </tbody>
                 </table>
             </div>

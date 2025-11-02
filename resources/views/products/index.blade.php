@@ -31,12 +31,13 @@
                             <th>Purchase Price</th>
                             <th>Sale Price</th>
                             <th>Warehouse</th>
+                            <th>Movements</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($products as $product)
-                        <tr>
+                        <tr @if($product->quantity <= $product->min_quantity) class="table-danger" @endif>
                             <td>{{ $product->name }}</td>
                             <td>{{ $product->sku }}</td>
                             <td>{{ $product->quantity }}</td>
@@ -45,6 +46,11 @@
                             <td>{{ $product->purchase_price ?? 'N/A' }}</td>
                             <td>{{ $product->sale_price ?? 'N/A' }}</td>
                             <td>{{ $product->warehouse->name ?? 'N/A' }}</td>
+                            <td>
+                                <a href="{{ route('inventory_movements.show', $product->id) }}" class="btn btn-sm btn-info">
+                                    <i class="bx bx-show"></i> Movements
+                                </a>
+                            </td>
                             <td>
                                 <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-warning">
                                     <i class="bx bx-edit"></i> Edit

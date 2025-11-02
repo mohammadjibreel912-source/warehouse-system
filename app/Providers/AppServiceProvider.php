@@ -13,6 +13,7 @@ use App\Models\Sale;
 use App\Models\Lease;
 use App\Models\User;
 use App\Models\Notification;
+use App\Models\InventoryMovement;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,8 +28,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-
-    public function boot()
+    public function boot(): void
     {
         // مشاركة البيانات مع جميع الـ views
         View::composer('*', function ($view) {
@@ -40,13 +40,20 @@ class AppServiceProvider extends ServiceProvider
             $totalPurchases   = Purchase::count();
             $totalSales       = Sale::count();
             $totalLeases      = Lease::count();
-                $unreadCount = Notification::whereNull('read_at')->count();
-    $unreadNotifications = Notification::whereNull('read_at')->latest()->take(5)->get();
 
-
-            // الإيرادات لهذا الشهر (تأكد أن عمود المبلغ في جدول sales هو 'amount')
+            // الإيرادات لهذا الشهر
             $monthlyRevenue = Sale::whereMonth('created_at', now()->month)
                                   ->sum('price');
+
+            // الإشعارات الغير مقروءة
+            $unreadCount = Notification::whereNull('read_at')->count();
+            $unreadNotifications = Notification::whereNull('read_at')->latest()->take(5)->get();
+
+            // آخر 5 حركات مخزون
+            $latestInventoryMovements = InventoryMovement::with('product')
+                ->latest()
+                ->take(5)
+                ->get();
 
             $view->with([
                 'totalWarehouses' => $totalWarehouses,
@@ -58,7 +65,8 @@ class AppServiceProvider extends ServiceProvider
                 'totalLeases'     => $totalLeases,
                 'monthlyRevenue'  => $monthlyRevenue,
                 'unreadCount' => $unreadCount,
-                'unreadNotifications' =>$unreadNotifications
+                'unreadNotifications' => $unreadNotifications,
+                'latestInventoryMovements' => $latestInventoryMovements,
             ]);
         });
     }

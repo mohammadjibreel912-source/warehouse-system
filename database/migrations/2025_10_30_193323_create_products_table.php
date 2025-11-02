@@ -21,6 +21,9 @@ return new class extends Migration
     $table->decimal('purchase_price', 10, 2)->nullable();
     $table->decimal('sale_price', 10, 2)->nullable();
     $table->foreignId('warehouse_id')->constrained()->onDelete('cascade');
+        $table->string('category')->nullable();
+    $table->enum('status', ['active', 'expired'])->default('active'); // لمتابعة الصلاحية
+
     $table->timestamps();
         });
     }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Warehouse;
+use App\Models\InventoryMovement;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -33,7 +35,24 @@ class ProductController extends Controller
             'warehouse_id' => 'required|exists:warehouses,id',
         ]);
 
-        Product::create($request->all());
+        $product = Product::create($request->all());
+
+        // سجل حركة المخزون
+        InventoryMovement::create([
+            'product_id' => $product->id,
+            'quantity' => $product->quantity,
+            'type' => 'initial_stock',
+        ]);
+
+        // تحقق من الحد الأدنى
+        if ($product->quantity <= $product->min_quantity) {
+            Notification::create([
+                'type' => 'stock',
+                'message' => "Product {$product->name} is below minimum stock.",
+                'product_id' => $product->id,
+            ]);
+        }
+
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
     }
 
@@ -61,7 +80,28 @@ class ProductController extends Controller
             'warehouse_id' => 'required|exists:warehouses,id',
         ]);
 
+        $oldQuantity = $product->quantity;
         $product->update($request->all());
+
+        // سجل حركة المخزون إذا تغيرت الكمية
+        $diff = $product->quantity - $oldQuantity;
+        if ($diff != 0) {
+            InventoryMovement::create([
+                'product_id' => $product->id,
+                'quantity' => $diff,
+                'type' => 'adjustment',
+            ]);
+        }
+
+        // تحقق من الحد الأدنى
+        if ($product->quantity <= $product->min_quantity) {
+            Notification::create([
+                'type' => 'stock',
+                'message' => "Product {$product->name} is below minimum stock.",
+                'product_id' => $product->id,
+            ]);
+        }
+
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
     }
 

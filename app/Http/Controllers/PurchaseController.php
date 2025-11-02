@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\Product;
+use App\Models\InventoryMovement;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class PurchaseController extends Controller
@@ -32,7 +34,29 @@ class PurchaseController extends Controller
             'purchase_date' => 'required|date',
         ]);
 
-        Purchase::create($request->all());
+        $purchase = Purchase::create($request->all());
+
+        // تحديث كمية المنتج
+        $product = Product::find($purchase->product_id);
+        $product->quantity += $purchase->quantity;
+        $product->save();
+
+        // سجل حركة المخزون
+        InventoryMovement::create([
+            'product_id' => $product->id,
+            'quantity' => $purchase->quantity,
+            'type' => 'purchase',
+        ]);
+
+        // تحقق من الحد الأدنى
+        if ($product->quantity <= $product->min_quantity) {
+            Notification::create([
+                'type' => 'stock',
+                'message' => "Product {$product->name} is below minimum stock.",
+                'product_id' => $product->id,
+            ]);
+        }
+
         return redirect()->route('purchases.index')->with('success', 'Purchase created successfully.');
     }
 
@@ -58,12 +82,45 @@ class PurchaseController extends Controller
             'purchase_date' => 'required|date',
         ]);
 
+        // تعديل كمية المنتج
+        $oldQuantity = $purchase->quantity;
         $purchase->update($request->all());
+
+        $product = Product::find($purchase->product_id);
+        $product->quantity = $product->quantity - $oldQuantity + $purchase->quantity;
+        $product->save();
+
+        InventoryMovement::create([
+            'product_id' => $product->id,
+            'quantity' => $purchase->quantity - $oldQuantity,
+            'type' => 'purchase',
+        ]);
+
+        // تحقق من الحد الأدنى
+        if ($product->quantity <= $product->min_quantity) {
+            Notification::create([
+                'type' => 'stock',
+                'message' => "Product {$product->name} is below minimum stock.",
+                'product_id' => $product->id,
+            ]);
+        }
+
         return redirect()->route('purchases.index')->with('success', 'Purchase updated successfully.');
     }
 
     public function destroy(Purchase $purchase)
     {
+        // تعديل كمية المنتج عند حذف عملية الشراء
+        $product = Product::find($purchase->product_id);
+        $product->quantity -= $purchase->quantity;
+        $product->save();
+
+        InventoryMovement::create([
+            'product_id' => $product->id,
+            'quantity' => -$purchase->quantity,
+            'type' => 'purchase_deleted',
+        ]);
+
         $purchase->delete();
         return redirect()->route('purchases.index')->with('success', 'Purchase deleted successfully.');
     }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Sale;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\InventoryMovement;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class SaleController extends Controller
@@ -32,7 +34,28 @@ class SaleController extends Controller
             'sale_date' => 'required|date',
         ]);
 
-        Sale::create($request->all());
+        $sale = Sale::create($request->all());
+
+        // تحديث كمية المنتج
+        $product = Product::find($sale->product_id);
+        $product->quantity -= $sale->quantity;
+        $product->save();
+
+        InventoryMovement::create([
+            'product_id' => $product->id,
+            'quantity' => -$sale->quantity,
+            'type' => 'sale',
+        ]);
+
+        // تحقق من الحد الأدنى
+        if ($product->quantity <= $product->min_quantity) {
+            Notification::create([
+                'type' => 'stock',
+                'message' => "Product {$product->name} is below minimum stock.",
+                'product_id' => $product->id,
+            ]);
+        }
+
         return redirect()->route('sales.index')->with('success', 'Sale created successfully.');
     }
 
@@ -58,12 +81,42 @@ class SaleController extends Controller
             'sale_date' => 'required|date',
         ]);
 
+        $oldQuantity = $sale->quantity;
         $sale->update($request->all());
+
+        $product = Product::find($sale->product_id);
+        $product->quantity += $oldQuantity - $sale->quantity;
+        $product->save();
+
+        InventoryMovement::create([
+            'product_id' => $product->id,
+            'quantity' => $oldQuantity - $sale->quantity,
+            'type' => 'sale_adjusted',
+        ]);
+
+        if ($product->quantity <= $product->min_quantity) {
+            Notification::create([
+                'type' => 'stock',
+                'message' => "Product {$product->name} is below minimum stock.",
+                'product_id' => $product->id,
+            ]);
+        }
+
         return redirect()->route('sales.index')->with('success', 'Sale updated successfully.');
     }
 
     public function destroy(Sale $sale)
     {
+        $product = Product::find($sale->product_id);
+        $product->quantity += $sale->quantity;
+        $product->save();
+
+        InventoryMovement::create([
+            'product_id' => $product->id,
+            'quantity' => $sale->quantity,
+            'type' => 'sale_deleted',
+        ]);
+
         $sale->delete();
         return redirect()->route('sales.index')->with('success', 'Sale deleted successfully.');
     }

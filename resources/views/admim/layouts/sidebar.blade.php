@@ -2,7 +2,7 @@
   <div class="app-brand demo py-3 px-3">
     <a href="{{ route('admin.dashboard') }}" class="app-brand-link d-flex align-items-center">
       <span class="app-brand-logo demo me-2">
-        <!-- SVG Logo هنا -->
+        <!-- You can add your SVG or logo image here -->
       </span>
       <span class="app-brand-text fw-bolder">InventoryPro&deg;</span>
     </a>
@@ -91,6 +91,28 @@
       </a>
     </li>
 
+    <!-- Inventory -->
+    <li class="menu-header small text-uppercase text-muted mt-3">
+      <i class="bx bx-package me-1"></i>Inventory
+    </li>
+    <li class="menu-item">
+      <a href="{{ route('inventory_movements.index') }}" class="menu-link d-flex align-items-center">
+        <i class="menu-icon tf-icons bx bx-layer text-primary me-2"></i>
+        <div>Inventory Movements</div>
+      </a>
+    </li>
+
+    <!-- Notifications -->
+    <li class="menu-header small text-uppercase text-muted mt-3">
+      <i class="bx bx-bell me-1"></i>Notifications
+    </li>
+    <li class="menu-item">
+      <a href="{{ route('notifications.index') }}" class="menu-link d-flex align-items-center">
+        <i class="menu-icon tf-icons bx bx-bell text-warning me-2"></i>
+        <div>Alerts</div>
+      </a>
+    </li>
+
     <!-- Settings -->
     <li class="menu-header small text-uppercase text-muted mt-3">
       <i class="bx bx-cog me-1"></i>Settings
@@ -101,6 +123,7 @@
         <div>Manage Users</div>
       </a>
     </li>
+
     <li class="menu-item">
       <form action="{{ route('logout') }}" method="POST" class="d-inline w-100">
         @csrf
@@ -110,7 +133,6 @@
         </button>
       </form>
     </li>
+
   </ul>
 </aside>
-
-

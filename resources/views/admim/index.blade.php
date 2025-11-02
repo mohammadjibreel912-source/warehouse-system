@@ -44,7 +44,6 @@
         }
     }
 </style>
-
 <div class="">
     <div class="container-xxl flex-grow-1 container-p-y">
 
@@ -129,6 +128,57 @@
                         <i class="bx bx-dollar fs-1 text-success mb-2"></i>
                         <h6 class="text-muted mb-1">Revenue (This Month)</h6>
                         <h3 class="fw-bold">${{ number_format($monthlyRevenue, 2) }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards Row 3: Inventory -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3 col-sm-6">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <i class="bx bx-archive fs-1 text-info mb-2"></i>
+                        <h6 class="text-muted mb-1">Total Inventory</h6>
+                        <h3 class="fw-bold">{{ $totalInventory ?? 0 }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9 col-sm-12">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h6 class="mb-0">Latest Inventory Movements</h6>
+                    </div>
+                    <div class="card-body">
+                        @if($latestInventoryMovements->isEmpty())
+                            <p>No inventory movements found.</p>
+                        @else
+                            <div class="table-responsive text-nowrap">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Type</th>
+                                            <th>Quantity</th>
+                                            <th>Note</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($latestInventoryMovements as $movement)
+                                        <tr>
+                                            <td>{{ $movement->product->name }}</td>
+                                            <td>{{ ucfirst($movement->type) }}</td>
+                                            <td>{{ $movement->quantity }}</td>
+                                            <td>{{ $movement->note ?? '-' }}</td>
+                                            <td>{{ $movement->created_at->format('Y-m-d') }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

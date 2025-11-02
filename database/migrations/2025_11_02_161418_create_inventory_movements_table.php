@@ -11,17 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('leases', function (Blueprint $table) {
+                Schema::create('inventory_movements', function (Blueprint $table) {
                $table->id();
-    $table->foreignId('warehouse_id')->constrained()->onDelete('cascade');
-    $table->date('start_date');
-    $table->date('end_date');
-    $table->decimal('rent_amount', 10, 2);
-        $table->integer('notify_before_days')->default(30);
-
+    $table->foreignId('product_id')->constrained()->onDelete('cascade');
+    $table->enum('type', ['in', 'out']); // دخول أو خروج
+    $table->integer('quantity');
+    $table->text('note')->nullable();
     $table->timestamps();
 
         });
+
     }
 
     /**
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leases');
+        Schema::dropIfExists('inventory_movements');
     }
 };

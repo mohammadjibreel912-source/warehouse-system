@@ -32,7 +32,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($sales as $sale)
+                        @forelse($sales as $sale)
                         <tr>
                             <td>{{ $sale->customer->name }}</td>
                             <td>{{ $sale->product->name }}</td>
@@ -52,7 +52,11 @@
                                 </form>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="6" class="text-center">No sales found.</td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

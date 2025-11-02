@@ -6,6 +6,16 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form action="{{ route('purchases.store') }}" method="POST">
                 @csrf
 
@@ -49,7 +59,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-success">
-                    <i class="bx bx-plus me-1"></i> Create
+                    <i class="bx bx-plus me-1"></i> Create Purchase
                 </button>
             </form>
         </div>
