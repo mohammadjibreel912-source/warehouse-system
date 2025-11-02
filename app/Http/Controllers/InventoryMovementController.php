@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\InventoryMovement;
 use App\Models\Product;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -26,14 +25,39 @@ class InventoryMovementController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'type' => 'required|in:in,out',
+            'type' => 'required|in:' . implode(',', InventoryMovement::types()),
             'quantity' => 'required|integer|min:1',
             'note' => 'nullable|string',
         ]);
 
-        InventoryMovement::create($request->all());
+        $product = Product::findOrFail($request->product_id);
 
-        return redirect()->route('inventory_movements.index')->with('success', 'Inventory movement added successfully.');
+        // تحديد أنواع الحركات التي تزيد الكمية
+        $incomingTypes = [
+            InventoryMovement::TYPE_IN,
+            InventoryMovement::TYPE_PURCHASE,
+            InventoryMovement::TYPE_INITIAL_STOCK,
+            InventoryMovement::TYPE_ADJUSTMENT,
+        ];
+
+        if (in_array($request->type, $incomingTypes)) {
+            $product->quantity += $request->quantity;
+        } else {
+            $product->quantity -= $request->quantity;
+        }
+
+        $product->save();
+
+        // إنشاء سجل الحركة
+        InventoryMovement::create([
+            'product_id' => $request->product_id,
+            'quantity' => $request->quantity,
+            'type' => $request->type,
+            'note' => $request->note,
+        ]);
+
+        return redirect()->route('inventory_movements.index')
+                         ->with('success', 'Inventory movement added successfully. Remaining quantity: ' . $product->quantity);
     }
 
     public function edit(InventoryMovement $inventoryMovement)
@@ -46,25 +70,76 @@ class InventoryMovementController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'type' => 'required|in:in,out',
+            'type' => 'required|in:' . implode(',', InventoryMovement::types()),
             'quantity' => 'required|integer|min:1',
             'note' => 'nullable|string',
         ]);
 
-        $inventoryMovement->update($request->all());
+        $product = Product::findOrFail($inventoryMovement->product_id);
 
-        return redirect()->route('inventory_movements.index')->with('success', 'Inventory movement updated successfully.');
+        $incomingTypes = [
+            InventoryMovement::TYPE_IN,
+            InventoryMovement::TYPE_PURCHASE,
+            InventoryMovement::TYPE_INITIAL_STOCK,
+            InventoryMovement::TYPE_ADJUSTMENT,
+        ];
+
+        // عكس كمية الحركة القديمة
+        if (in_array($inventoryMovement->type, $incomingTypes)) {
+            $product->quantity -= $inventoryMovement->quantity;
+        } else {
+            $product->quantity += $inventoryMovement->quantity;
+        }
+
+        // تحديث الحركة
+        $inventoryMovement->update([
+            'product_id' => $request->product_id,
+            'quantity' => $request->quantity,
+            'type' => $request->type,
+            'note' => $request->note,
+        ]);
+
+        // تطبيق كمية الحركة الجديدة
+        if (in_array($request->type, $incomingTypes)) {
+            $product->quantity += $request->quantity;
+        } else {
+            $product->quantity -= $request->quantity;
+        }
+
+        $product->save();
+
+        return redirect()->route('inventory_movements.index')
+                         ->with('success', 'Inventory movement updated successfully. Remaining quantity: ' . $product->quantity);
     }
 
     public function destroy(InventoryMovement $inventoryMovement)
     {
+        $incomingTypes = [
+            InventoryMovement::TYPE_IN,
+            InventoryMovement::TYPE_PURCHASE,
+            InventoryMovement::TYPE_INITIAL_STOCK,
+            InventoryMovement::TYPE_ADJUSTMENT,
+        ];
+
+        $product = Product::findOrFail($inventoryMovement->product_id);
+
+        // عكس الحركة عند الحذف
+        if (in_array($inventoryMovement->type, $incomingTypes)) {
+            $product->quantity -= $inventoryMovement->quantity;
+        } else {
+            $product->quantity += $inventoryMovement->quantity;
+        }
+
+        $product->save();
+
         $inventoryMovement->delete();
-        return redirect()->route('inventory_movements.index')->with('success', 'Inventory movement deleted successfully.');
+
+        return redirect()->route('inventory_movements.index')
+                         ->with('success', 'Inventory movement deleted successfully. Remaining quantity: ' . $product->quantity);
     }
 
     public function show(InventoryMovement $inventoryMovement)
-{
-    return view('inventory.show', compact('inventoryMovement'));
-}
-
+    {
+        return view('inventory.show', compact('inventoryMovement'));
+    }
 }

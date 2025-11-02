@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class SaleController extends Controller
 {
-   public function index()
+    public function index()
     {
         $sales = Sale::with(['customer', 'product'])->get();
         return view('sales.index', compact('sales'));
@@ -34,9 +34,17 @@ class SaleController extends Controller
             'sale_date' => 'required|date',
         ]);
 
+        $product = Product::find($request->product_id);
+
+        // التحقق من المخزون قبل البيع
+        if ($request->quantity > $product->quantity) {
+            return redirect()->back()->withErrors([
+                'quantity' => "الكمية المطلوبة أكبر من المخزون المتوفر ({$product->quantity})"
+            ])->withInput();
+        }
+
         $sale = Sale::create($request->all());
 
-        $product = Product::find($sale->product_id);
         $product->quantity -= $sale->quantity;
         $product->save();
 
@@ -46,7 +54,7 @@ class SaleController extends Controller
             'type' => 'sale',
         ]);
 
-        if ($product->quantity <= $product->min_quantity) {
+        if ($product->quantity >= $product->min_quantity) {
             Notification::create([
                 'type' => 'stock',
                 'message' => "Product {$product->name} is below minimum stock.",
@@ -54,7 +62,8 @@ class SaleController extends Controller
             ]);
         }
 
-        return redirect()->route('sales.index')->with('success', 'Sale created successfully.');
+        return redirect()->route('sales.index')
+            ->with('success', "Sale created successfully. Remaining stock: {$product->quantity} units.");
     }
 
     public function edit(Sale $sale)
@@ -74,16 +83,26 @@ class SaleController extends Controller
             'sale_date' => 'required|date',
         ]);
 
+        $product = Product::find($request->product_id);
         $oldQuantity = $sale->quantity;
+        $availableQuantity = $product->quantity + $oldQuantity; // المخزون الحالي + الكمية القديمة للصفقة
+
+        // التحقق من المخزون قبل تعديل البيع
+        if ($request->quantity >= $availableQuantity) {
+            return redirect()->back()->withErrors([
+                'quantity' => "الكمية المطلوبة أكبر من المخزون المتوفر ({$availableQuantity})"
+            ])->withInput();
+        }
+
         $sale->update($request->all());
 
-        $product = Product::find($sale->product_id);
-        $product->quantity += $oldQuantity - $sale->quantity;
+        // تحديث المخزون بعد التعديل
+        $product->quantity = $availableQuantity - $request->quantity;
         $product->save();
 
         InventoryMovement::create([
             'product_id' => $product->id,
-            'quantity' => $oldQuantity - $sale->quantity,
+            'quantity' => $oldQuantity - $request->quantity,
             'type' => 'sale_adjusted',
         ]);
 
@@ -95,7 +114,8 @@ class SaleController extends Controller
             ]);
         }
 
-        return redirect()->route('sales.index')->with('success', 'Sale updated successfully.');
+        return redirect()->route('sales.index')
+            ->with('success', "Sale updated successfully. Remaining stock: {$product->quantity} units.");
     }
 
     public function destroy(Sale $sale)

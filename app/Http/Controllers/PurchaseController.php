@@ -11,12 +11,14 @@ use Illuminate\Http\Request;
 
 class PurchaseController extends Controller
 {
+    // عرض كل المشتريات
     public function index()
     {
         $purchases = Purchase::with(['supplier', 'product'])->get();
         return view('purchases.index', compact('purchases'));
     }
 
+    // نموذج إنشاء عملية شراء
     public function create()
     {
         $suppliers = Supplier::all();
@@ -24,8 +26,10 @@ class PurchaseController extends Controller
         return view('purchases.create', compact('suppliers', 'products'));
     }
 
+    // تخزين عملية شراء جديدة
     public function store(Request $request)
     {
+
         $request->validate([
             'supplier_id' => 'required|exists:suppliers,id',
             'product_id' => 'required|exists:products,id',
@@ -36,8 +40,7 @@ class PurchaseController extends Controller
 
         $purchase = Purchase::create($request->all());
 
-        // تحديث كمية المنتج
-        $product = Product::find($purchase->product_id);
+        $product = Product::findOrFail($purchase->product_id);
         $product->quantity += $purchase->quantity;
         $product->save();
 
@@ -45,26 +48,22 @@ class PurchaseController extends Controller
         InventoryMovement::create([
             'product_id' => $product->id,
             'quantity' => $purchase->quantity,
-            'type' => 'purchase',
+            'type' => InventoryMovement::TYPE_PURCHASE, // تأكد أن هذا متوافق مع ENUM في جدول inventory_movements
         ]);
 
         // تحقق من الحد الأدنى
-        if ($product->quantity <= $product->min_quantity) {
-            Notification::create([
-                'type' => 'stock',
-                'message' => "Product {$product->name} is below minimum stock.",
-                'product_id' => $product->id,
-            ]);
-        }
+        $this->checkMinimumStock($product);
 
         return redirect()->route('purchases.index')->with('success', 'Purchase created successfully.');
     }
 
+    // عرض تفاصيل عملية شراء
     public function show(Purchase $purchase)
     {
         return view('purchases.show', compact('purchase'));
     }
 
+    // نموذج تعديل عملية شراء
     public function edit(Purchase $purchase)
     {
         $suppliers = Supplier::all();
@@ -72,6 +71,7 @@ class PurchaseController extends Controller
         return view('purchases.edit', compact('purchase', 'suppliers', 'products'));
     }
 
+    // تحديث عملية شراء
     public function update(Request $request, Purchase $purchase)
     {
         $request->validate([
@@ -82,21 +82,47 @@ class PurchaseController extends Controller
             'purchase_date' => 'required|date',
         ]);
 
-        // تعديل كمية المنتج
         $oldQuantity = $purchase->quantity;
         $purchase->update($request->all());
 
-        $product = Product::find($purchase->product_id);
+        $product = Product::findOrFail($purchase->product_id);
         $product->quantity = $product->quantity - $oldQuantity + $purchase->quantity;
         $product->save();
 
         InventoryMovement::create([
             'product_id' => $product->id,
             'quantity' => $purchase->quantity - $oldQuantity,
-            'type' => 'purchase',
+            'type' => InventoryMovement::TYPE_PURCHASE,
         ]);
 
-        // تحقق من الحد الأدنى
+        $this->checkMinimumStock($product);
+
+        return redirect()->route('purchases.index')->with('success', 'Purchase updated successfully.');
+    }
+
+    // حذف عملية شراء
+    public function destroy(Purchase $purchase)
+    {
+        $product = Product::findOrFail($purchase->product_id);
+        $product->quantity -= $purchase->quantity;
+        $product->save();
+
+        InventoryMovement::create([
+            'product_id' => $product->id,
+            'quantity' => -$purchase->quantity,
+            'type' => InventoryMovement::TYPE_PURCHASE_DELETED,
+        ]);
+
+        $purchase->delete();
+
+        $this->checkMinimumStock($product);
+
+        return redirect()->route('purchases.index')->with('success', 'Purchase deleted successfully.');
+    }
+
+    // دالة للتحقق من الحد الأدنى وإرسال إشعار إذا انخفض المخزون
+    private function checkMinimumStock(Product $product)
+    {
         if ($product->quantity <= $product->min_quantity) {
             Notification::create([
                 'type' => 'stock',
@@ -104,24 +130,5 @@ class PurchaseController extends Controller
                 'product_id' => $product->id,
             ]);
         }
-
-        return redirect()->route('purchases.index')->with('success', 'Purchase updated successfully.');
-    }
-
-    public function destroy(Purchase $purchase)
-    {
-        // تعديل كمية المنتج عند حذف عملية الشراء
-        $product = Product::find($purchase->product_id);
-        $product->quantity -= $purchase->quantity;
-        $product->save();
-
-        InventoryMovement::create([
-            'product_id' => $product->id,
-            'quantity' => -$purchase->quantity,
-            'type' => 'purchase_deleted',
-        ]);
-
-        $purchase->delete();
-        return redirect()->route('purchases.index')->with('success', 'Purchase deleted successfully.');
     }
 }

@@ -18,6 +18,8 @@ class ProductController extends Controller
 
     public function store(Request $request)
 {
+
+
     $request->validate([
         'name' => 'required|string|max:255',
         'sku' => 'required|string|max:50|unique:products,sku',
@@ -41,7 +43,7 @@ class ProductController extends Controller
     InventoryMovement::create([
         'product_id' => $product->id,
         'quantity' => $product->quantity,
-        'type' => 'initial_stock',
+    'type' => InventoryMovement::TYPE_INITIAL_STOCK, // بدل 'initial_stock'
     ]);
 
     return redirect()->route('products.index')
@@ -76,7 +78,7 @@ public function update(Request $request, Product $product)
         InventoryMovement::create([
             'product_id' => $product->id,
             'quantity' => $diff,
-            'type' => 'adjustment',
+        'type' => InventoryMovement::TYPE_ADJUSTMENT, // بدل 'adjustment'
         ]);
     }
 

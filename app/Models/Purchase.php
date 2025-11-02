@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Purchase extends Model
 {
+    protected $casts = [
+    'purchase_date' => 'datetime',
+];
+
      protected $fillable = ['supplier_id', 'product_id', 'quantity', 'cost', 'purchase_date'];
 
     public function supplier()
@@ -17,4 +21,5 @@ class Purchase extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
 }
