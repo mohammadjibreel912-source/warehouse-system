@@ -6,6 +6,21 @@
 
     <div class="card mb-4 shadow-sm">
         <div class="card-body">
+            {{-- رسائل النجاح --}}
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            {{-- رسائل الخطأ المخصصة (مثل quantity <= min_quantity) --}}
+            @if(session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            {{-- رسائل التحقق التقليدية --}}
             @if($errors->any())
                 <div class="alert alert-danger">
                     <ul class="mb-0">

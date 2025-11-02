@@ -40,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
             $totalPurchases   = Purchase::count();
             $totalSales       = Sale::count();
             $totalLeases      = Lease::count();
+            $totalInventory = Product::sum('quantity');
 
             // الإيرادات لهذا الشهر
             $monthlyRevenue = Sale::whereMonth('created_at', now()->month)
@@ -67,6 +68,7 @@ class AppServiceProvider extends ServiceProvider
                 'unreadCount' => $unreadCount,
                 'unreadNotifications' => $unreadNotifications,
                 'latestInventoryMovements' => $latestInventoryMovements,
+                'totalInventory' => $totalInventory,
             ]);
         });
     }

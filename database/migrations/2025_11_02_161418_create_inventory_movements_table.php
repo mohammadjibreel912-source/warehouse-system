@@ -12,9 +12,17 @@ return new class extends Migration
     public function up(): void
     {
                 Schema::create('inventory_movements', function (Blueprint $table) {
-               $table->id();
+              $table->id();
     $table->foreignId('product_id')->constrained()->onDelete('cascade');
-    $table->enum('type', ['in', 'out']); // دخول أو خروج
+    $table->enum('type', [
+        'in',            // إضافة مخزون عادي
+        'out',           // خصم مخزون عادي
+        'initial_stock', // عند إنشاء المنتج لأول مرة
+        'sale',          // عند بيع المنتج
+        'sale_adjusted', // تعديل بيع
+        'sale_deleted',  // حذف بيع
+        'adjustment'     // تعديل يدوي
+    ])->default('in');
     $table->integer('quantity');
     $table->text('note')->nullable();
     $table->timestamps();

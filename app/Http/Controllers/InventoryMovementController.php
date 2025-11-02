@@ -61,4 +61,10 @@ class InventoryMovementController extends Controller
         $inventoryMovement->delete();
         return redirect()->route('inventory_movements.index')->with('success', 'Inventory movement deleted successfully.');
     }
+
+    public function show(InventoryMovement $inventoryMovement)
+{
+    return view('inventory.show', compact('inventoryMovement'));
+}
+
 }

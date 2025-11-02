@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class SaleController extends Controller
 {
-    public function index()
+   public function index()
     {
         $sales = Sale::with(['customer', 'product'])->get();
         return view('sales.index', compact('sales'));
@@ -36,7 +36,6 @@ class SaleController extends Controller
 
         $sale = Sale::create($request->all());
 
-        // تحديث كمية المنتج
         $product = Product::find($sale->product_id);
         $product->quantity -= $sale->quantity;
         $product->save();
@@ -47,7 +46,6 @@ class SaleController extends Controller
             'type' => 'sale',
         ]);
 
-        // تحقق من الحد الأدنى
         if ($product->quantity <= $product->min_quantity) {
             Notification::create([
                 'type' => 'stock',
@@ -57,11 +55,6 @@ class SaleController extends Controller
         }
 
         return redirect()->route('sales.index')->with('success', 'Sale created successfully.');
-    }
-
-    public function show(Sale $sale)
-    {
-        return view('sales.show', compact('sale'));
     }
 
     public function edit(Sale $sale)
