@@ -4,12 +4,6 @@
 <div class="container-xxl flex-grow-1 container-p-y">
     <h4 class="fw-bold py-3 mb-4">All Suppliers</h4>
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
 
     <div class="mb-4">
         <a href="{{ route('suppliers.create') }}" class="btn btn-primary">
@@ -30,13 +24,14 @@
                         <a href="{{ route('suppliers.edit', $supplier->id) }}" class="btn btn-sm btn-warning">
                             <i class="bx bx-edit"></i> Edit
                         </a>
-                        <form action="{{ route('suppliers.destroy', $supplier->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
-                                <i class="bx bx-trash"></i> Delete
-                            </button>
-                        </form>
+                      <form action="{{ route('suppliers.destroy', $supplier->id) }}" method="POST" class="d-inline delete-form">
+    @csrf
+    @method('DELETE')
+    <button type="button" class="btn btn-sm btn-danger btn-delete">
+        <i class="bx bx-trash"></i> Delete
+    </button>
+</form>
+
                     </div>
                 </div>
             </div>

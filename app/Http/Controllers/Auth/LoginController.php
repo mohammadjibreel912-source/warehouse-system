@@ -39,12 +39,24 @@ class LoginController extends Controller
     }
 
 
-    protected function redirectTo()
-    {
-        if (Auth::user()->role === 'admin') {
-            return '/admin/dashboard';
-        }
+   protected function redirectTo()
+{
+    $role = Auth::user()->role;
 
-        return '/';
+    switch ($role) {
+        case 'admin':
+            return '/admin/dashboard';
+        case 'warehouse_manager':
+            return '/warehouses';
+        case 'sales':
+            return '/sales';
+        case 'purchases':
+            return '/purchases';
+        case 'accountant':
+            return '/invoices';
+        default:
+            return '/'; // المستخدم العادي أو أي دور آخر
     }
+}
+
 }

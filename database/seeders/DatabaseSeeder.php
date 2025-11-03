@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
         SaleSeeder::class,
         NotificationSeeder::class,
                 InventoryMovementSeeder::class,
+        InvoiceSeeder::class,
 
     ]);
 

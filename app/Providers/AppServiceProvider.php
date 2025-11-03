@@ -14,6 +14,7 @@ use App\Models\Lease;
 use App\Models\User;
 use App\Models\Notification;
 use App\Models\InventoryMovement;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+            Paginator::useBootstrapFive(); // أو useBootstrapFour() إذا كنت تستخدم Bootstrap 4
+
         // مشاركة البيانات مع جميع الـ views
         View::composer('*', function ($view) {
 

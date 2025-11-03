@@ -4,10 +4,6 @@
 <div class="container-xxl flex-grow-1 container-p-y">
     <h4 class="fw-bold py-3 mb-4">All Users</h4>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
     <div class="card shadow-sm">
         <div class="card-body">
             <table class="table table-hover">
@@ -25,10 +21,10 @@
                         <td>{{ $user->email }}</td>
                         <td>
                             <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-warning">Edit</a>
-                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline">
+                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline btn-delete">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                                <button type="button" class="btn btn-sm btn-danger" >Delete</button>
                             </form>
                         </td>
                     </tr>

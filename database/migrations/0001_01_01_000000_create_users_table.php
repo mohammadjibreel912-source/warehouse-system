@@ -19,8 +19,16 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
-                $table->string('role')->default('user'); // user, admin
 
+            // تعديل role ليشمل كل الأدوار الممكنة
+            $table->enum('role', [
+                'admin',
+                'warehouse_manager',
+                'sales',
+                'purchases',
+                'accountant',
+                'user'
+            ])->default('user');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
