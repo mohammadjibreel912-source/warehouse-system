@@ -15,6 +15,7 @@ use App\Http\Controllers\InventoryMovementController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\InvoiceItemController;
 
 // Public route
 Route::get('/', function () {
@@ -35,6 +36,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Products
     Route::resource('products', ProductController::class);
+Route::resource('inventory_movements', InventoryMovementController::class);
 
     // Suppliers
     Route::resource('suppliers', SupplierController::class);
@@ -63,7 +65,6 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->prefix('admin')->
     Route::resource('users', UserController::class);
 
     // Inventory movements
-    Route::resource('inventory_movements', InventoryMovementController::class);
 
     // Admin notifications
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');

@@ -8,11 +8,26 @@ use Illuminate\Support\Facades\Auth;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, ...$roles)
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  string  $role
+     * @return mixed
+     */
+    public function handle(Request $request, Closure $next, string $role)
     {
+        if (!Auth::check()) {
+            // User is not logged in
+            return redirect()->route('login');
+        }
+
+        // Assuming your User model has a "role" field or "roles" relationship
         $user = Auth::user();
 
-        if (!$user || !in_array($user->role, $roles)) {
+        // If your user has a 'role' column (e.g., 'admin', 'user', etc.)
+        if ($user->role !== $role) {
             abort(403, 'Unauthorized');
         }
 

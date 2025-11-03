@@ -137,9 +137,13 @@ class InventoryMovementController extends Controller
         return redirect()->route('inventory_movements.index')
                          ->with('success', 'Inventory movement deleted successfully. Remaining quantity: ' . $product->quantity);
     }
+public function show(\App\Models\InventoryMovement $inventory_movement)
+{
+    return view('inventory.show', compact('inventory_movement'));
+}
 
-    public function show(InventoryMovement $inventoryMovement)
-    {
-        return view('inventory.show', compact('inventoryMovement'));
-    }
+
+
+
+
 }
